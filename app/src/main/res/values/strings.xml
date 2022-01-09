@@ -4,4 +4,8 @@
     <string name="new_stories">New Stories</string>
     <string name="best_stories">Best Stories</string>
     <string name="more">More</string>
+
+    <string name="string_label_point">score</string>
+    <string name="string_label_comment">Comments</string>
+    <string name="string_label_article">Full Article</string>
 </resources>
