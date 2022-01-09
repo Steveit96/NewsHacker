@@ -1,13 +1,13 @@
-package com.steven.newshacker.ui.dashboard
+package com.steven.newshacker.ui.more
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class DashboardViewModel : ViewModel() {
+class MoreViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
-        value = "This is dashboard Fragment"
+        value = "This is home Fragment"
     }
     val text: LiveData<String> = _text
 }
