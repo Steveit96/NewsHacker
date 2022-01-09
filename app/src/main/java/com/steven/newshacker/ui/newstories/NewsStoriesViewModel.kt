@@ -1,13 +1,13 @@
-package com.steven.newshacker.ui.home
+package com.steven.newshacker.ui.newstories
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class HomeViewModel : ViewModel() {
+class NewsStoriesViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
-        value = "This is home Fragment"
+        value = "This is notifications Fragment"
     }
     val text: LiveData<String> = _text
 }

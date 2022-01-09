@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">NewsHacker</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="top_stories">Top Stories</string>
+    <string name="new_stories">New Stories</string>
+    <string name="best_stories">Best Stories</string>
+    <string name="more">More</string>
 </resources>

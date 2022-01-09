@@ -3,23 +3,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/navigation_top">
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="com.steven.newshacker.ui.home.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        android:id="@+id/navigation_top"
+        android:name="com.steven.newshacker.ui.topstories.TopStoriesFragment"
+        android:label="@string/top_stories"
+        tools:layout="@layout/fragment_top_stories" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.steven.newshacker.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        android:id="@+id/navigation_best"
+        android:name="com.steven.newshacker.ui.beststories.BestStoriesFragment"
+        android:label="@string/best_stories"
+        tools:layout="@layout/fragment_best_stories" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.steven.newshacker.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:id="@+id/navigation_new"
+        android:name="com.steven.newshacker.ui.newstories.NewStoriesFragment"
+        android:label="@string/new_stories"
+        tools:layout="@layout/fragment_new_stories" />
+
+    <fragment
+        android:id="@+id/navigation_more"
+        android:name="com.steven.newshacker.ui.more.MoreFragment"
+        android:label="@string/more"
+        tools:layout="@layout/fragment_more" />
 </navigation>
