@@ -1,5 +1,5 @@
 package com.steven.newshacker.model
 
 data class TopStoriesModel(
-    val topStoriesIdList: List<Long> = emptyList()
+    val storiesIdList: List<Long> = emptyList()
 )

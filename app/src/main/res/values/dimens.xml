@@ -17,4 +17,5 @@
     <dimen name="font_story_author_size">12sp</dimen>
     <dimen name="font_story_comment_size">12sp</dimen>
     <dimen name="font_story_article_size">12sp</dimen>
+    <dimen name="font_more_option_size">20sp</dimen>
 </resources>

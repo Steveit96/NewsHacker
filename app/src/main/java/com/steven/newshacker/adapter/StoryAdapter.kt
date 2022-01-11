@@ -11,18 +11,8 @@ class StoryAdapter(
     private val listener: OnStoryItemInteractionListener,
 ) : ListAdapter<StoryModel, StoryViewHolder>(StoryDiffCallBack()) {
 
-    private var highLightPosition = -1
-
     override fun getItemViewType(position: Int): Int {
         return position
-    }
-
-    fun updateData(items: List<StoryModel>) {
-        submitList(items)
-    }
-
-    fun highLightPosition(position: Int) {
-        highLightPosition = position
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoryViewHolder {
