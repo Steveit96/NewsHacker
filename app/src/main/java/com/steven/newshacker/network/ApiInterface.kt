@@ -8,9 +8,9 @@ import retrofit2.http.Path
 
 interface ApiInterface {
 
-    @GET("topstories.json?print=pretty")
-    suspend fun getTopStoriesIDList(): List<Long>
+    @GET("{strorytype}.json?print=pretty")
+    suspend fun getStoryIDList(@Path("strorytype") strorytype: String): List<Long>
 
     @GET("item/{storyId}.json?print=pretty")
-    suspend fun getTopStories(@Path("storyId") storyId: String) : StoryModel
+    suspend fun getTopStoryById(@Path("storyId") storyId: String) : StoryModel
 }

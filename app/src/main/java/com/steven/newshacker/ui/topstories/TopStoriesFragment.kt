@@ -65,12 +65,12 @@ class TopStoriesFragment : Fragment() {
 
     private fun setupObservers() {
         val storyList = ArrayList<StoryModel>()
-        topStoriesViewModel.getTopStoriesIDList().observe(viewLifecycleOwner, {
+        topStoriesViewModel.getTopStoriesIDList(VALUE_TYPE_TOP_STORY).observe(viewLifecycleOwner, {
             it?.let { storyIdList ->
                 when (storyIdList.status) {
                     Status.SUCCESS -> {
                         storyIdList.data?.forEachIndexed { index, l ->
-                            topStoriesViewModel.getStoriesById(l.toString())
+                            topStoriesViewModel.getTopStoriesById(l.toString())
                                 .observe(viewLifecycleOwner, { storyResource ->
                                     storyResource?.let { story ->
                                         when (story.status) {
@@ -96,10 +96,8 @@ class TopStoriesFragment : Fragment() {
                         }
                     }
                     Status.ERROR   -> {
-
                     }
                     Status.LOADING -> {
-
                     }
                 }
             }
@@ -109,5 +107,9 @@ class TopStoriesFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val VALUE_TYPE_TOP_STORY = "topstories"
     }
 }

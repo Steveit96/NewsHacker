@@ -2,7 +2,9 @@ package com.steven.newshacker.network
 
 class ApiHelper(private val apiInterface: ApiInterface) {
 
-    suspend fun fetchTopStories(storyId: String) = apiInterface.getTopStories(storyId)
+    // Fetch the list of ID's based on the given storyType
+    suspend fun fetchStoryIDList(storyType: String) = apiInterface.getStoryIDList(storyType)
 
-    suspend fun fetchTopStoriesIDList() = apiInterface.getTopStoriesIDList()
+    // Fetch the story details based on the ID
+    suspend fun fetchStoryById(storyId: String) = apiInterface.getTopStoryById(storyId)
 }
