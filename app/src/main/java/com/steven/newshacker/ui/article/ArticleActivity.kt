@@ -83,23 +83,17 @@ class ArticleActivity : AppCompatActivity() {
                     binding.layoutHeader.labelScore.visibility = View.GONE
                 }
             }
-            intent.getStringExtra(Constants.BUNDLE_STORY_URL)?.let {
-                if(it.isNotEmpty()) {
-                    binding.layoutWeb.webViewClient = WebViewClient()
-                    binding.layoutWeb.loadUrl(it)
-                    binding.layoutWeb.settings.javaScriptEnabled = true
-                    binding.layoutWeb.settings.setSupportZoom(true)
+            binding.layoutWeb.webViewClient = WebViewClient()
+            binding.layoutWeb.loadUrl( intent.getStringExtra(Constants.BUNDLE_STORY_URL).toString())
+            binding.layoutWeb.settings.javaScriptEnabled = true
+            binding.layoutWeb.settings.setSupportZoom(true)
 
-                    binding.layoutWeb.webViewClient = object : WebViewClient() {
-                        override fun onPageFinished(view: WebView, url: String) {
-                            binding.nestedScrollView.visibility = View.VISIBLE
-                            binding.appBarLayout.visibility = View.VISIBLE
-                            binding.layoutWeb.visibility = View.VISIBLE
-                            binding.progressBar.visibility = View.GONE
-                        }
-                    }
-                } else {
-                    Toast.makeText(this, "Url Not Found", Toast.LENGTH_SHORT).show()
+            binding.layoutWeb.webViewClient = object : WebViewClient() {
+                override fun onPageFinished(view: WebView, url: String) {
+                    binding.nestedScrollView.visibility = View.VISIBLE
+                    binding.appBarLayout.visibility = View.VISIBLE
+                    binding.layoutWeb.visibility = View.VISIBLE
+                    binding.progressBar.visibility = View.GONE
                 }
             }
 
