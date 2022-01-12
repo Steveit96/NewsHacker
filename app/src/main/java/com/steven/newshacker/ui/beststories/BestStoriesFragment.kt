@@ -1,17 +1,18 @@
 package com.steven.newshacker.ui.beststories
 
 import android.annotation.SuppressLint
+import android.app.SearchManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
+import android.view.*
+import android.widget.SearchView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.mindorks.retrofit.coroutines.utils.Status
+import com.steven.newshacker.R
 import com.steven.newshacker.adapter.StoryAdapter
 import com.steven.newshacker.databinding.FragmentBestStoriesBinding
 import com.steven.newshacker.listener.OnStoryItemInteractionListener
@@ -74,6 +75,21 @@ class BestStoriesFragment : Fragment() {
         )
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.search_menu, menu)
+        val manager = requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        val search: SearchView = menu.findItem(R.id.search).actionView as SearchView
+        search.setSearchableInfo(manager.getSearchableInfo(requireActivity().componentName))
+        search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
+            }
+
+            override fun onQueryTextChange(query: String?): Boolean {
+                return true
+            }
+        })
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -84,6 +100,7 @@ class BestStoriesFragment : Fragment() {
             this,
             ViewModelFactory(ApiHelper(RetrofitBuilder.apiService))
         )[BestStoriesViewModel::class.java]
+        setHasOptionsMenu(true)
         _binding = FragmentBestStoriesBinding.inflate(inflater, container, false)
         setupUI()
         fetchStoryIdList()
@@ -126,7 +143,6 @@ class BestStoriesFragment : Fragment() {
             it?.let { storyIdList ->
                 when (storyIdList.status) {
                     Status.SUCCESS -> {
-                        Toast.makeText(requireContext(), "Success", Toast.LENGTH_SHORT).show()
                         storyIdList.data?.let { idList ->
                             cachedStoryIdList =  idList
                             cachedStoryList = ArrayList()
@@ -136,10 +152,8 @@ class BestStoriesFragment : Fragment() {
                         }
                     }
                     Status.ERROR   -> {
-                        Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
                     }
                     Status.LOADING -> {
-                        Toast.makeText(requireContext(), "Load", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
