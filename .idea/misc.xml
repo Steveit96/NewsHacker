@@ -14,6 +14,7 @@
         <entry key="app/src/main/res/drawable/ic_baseline_comment_24.xml" value="0.35052083333333334" />
         <entry key="app/src/main/res/drawable/ic_baseline_folder_special_24.xml" value="0.35052083333333334" />
         <entry key="app/src/main/res/drawable/ic_baseline_more_vert_24.xml" value="0.2222222222222222" />
+        <entry key="app/src/main/res/drawable/ic_baseline_search_24.xml" value="0.35052083333333334" />
         <entry key="app/src/main/res/drawable/ic_dashboard_black_24dp.xml" value="0.2222222222222222" />
         <entry key="app/src/main/res/drawable/ic_top_24.xml" value="0.2222222222222222" />
         <entry key="app/src/main/res/layout/activity_article.xml" value="0.334375" />
@@ -30,6 +31,7 @@
         <entry key="app/src/main/res/layout/layout_more_option.xml" value="0.2726449275362319" />
         <entry key="app/src/main/res/layout/layout_story.xml" value="0.33" />
         <entry key="app/src/main/res/menu/bottom_nav_menu.xml" value="0.33177083333333335" />
+        <entry key="app/src/main/res/menu/search_menu.xml" value="0.334375" />
       </map>
     </option>
   </component>

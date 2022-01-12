@@ -1,17 +1,18 @@
 package com.steven.newshacker.ui.topstories
 
 import android.annotation.SuppressLint
+import android.app.SearchManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
+import android.view.*
+import android.widget.SearchView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.mindorks.retrofit.coroutines.utils.Status
+import com.steven.newshacker.R
 import com.steven.newshacker.adapter.StoryAdapter
 import com.steven.newshacker.databinding.FragmentTopStoriesBinding
 import com.steven.newshacker.listener.OnStoryItemInteractionListener
@@ -22,6 +23,9 @@ import com.steven.newshacker.ui.article.ArticleActivity
 import com.steven.newshacker.ui.comments.CommentsActivity
 import com.steven.newshacker.ui.ViewModelFactory
 import com.steven.newshacker.utils.Constants
+
+
+
 
 class TopStoriesFragment : Fragment() {
 
@@ -70,15 +74,30 @@ class TopStoriesFragment : Fragment() {
                     })
                 }
 
-            }
-                    )
+            })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.search_menu, menu)
+            val manager = requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
+            val search: SearchView = menu.findItem(R.id.search).actionView as SearchView
+            search.setSearchableInfo(manager.getSearchableInfo(requireActivity().componentName))
+            search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    return true
+                }
+
+                override fun onQueryTextChange(query: String?): Boolean {
+                    return true
+                }
+            })
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
-                             ): View {
+        savedInstanceState: Bundle?): View {
+        setHasOptionsMenu(true)
         topStoriesViewModel = ViewModelProvider(
             this,
             ViewModelFactory(ApiHelper(RetrofitBuilder.apiService))
@@ -87,30 +106,38 @@ class TopStoriesFragment : Fragment() {
         setupUI()
         fetchStoryIdList()
        binding.topStoryList.addOnScrollListener(
-            object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    val layoutManager = recyclerView.layoutManager
-                    if (layoutManager is androidx.recyclerview.widget.LinearLayoutManager) {
-                        if (dy > 0) //check for scroll down
-                        {
-                            if (loading) {
-                                if ((layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition()) >= layoutManager.itemCount) {
-                                    loading = false
-                                    firstIndex = lastIndex
-                                    lastIndex += 10
-                                    if (lastIndex > cachedStoryIdList.size-1) {
-                                        lastIndex = cachedStoryIdList.size-1
-                                    }
-                                    if (lastIndex <= cachedStoryIdList.size-1) {
-                                        fetchStoryById(cachedStoryIdList.subList(firstIndex, lastIndex), 0, cachedStoryIdList.subList(firstIndex, lastIndex).size)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    super.onScrolled(recyclerView, dx, dy)
-                }
-            },)
+           object : RecyclerView.OnScrollListener() {
+               override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                   val layoutManager =
+                           recyclerView.layoutManager
+                   if (layoutManager is androidx.recyclerview.widget.LinearLayoutManager) {
+                       if (dy > 0) //check for scroll down
+                       {
+                           if (loading) {
+                               if ((layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition()) >= layoutManager.itemCount) {
+                                   loading =
+                                           false
+                                   firstIndex =
+                                           lastIndex
+                                   lastIndex += 10
+                                   if (lastIndex > cachedStoryIdList.size - 1) {
+                                       lastIndex =
+                                               cachedStoryIdList.size - 1
+                                   }
+                                   if (lastIndex <= cachedStoryIdList.size - 1) {
+                                       fetchStoryById(cachedStoryIdList.subList(firstIndex,
+                                           lastIndex),
+                                           0,
+                                           cachedStoryIdList.subList(firstIndex, lastIndex).size)
+                                   }
+                               }
+                           }
+                       }
+                   }
+                   super.onScrolled(recyclerView, dx, dy)
+               }
+           },
+       )
         return binding.root
     }
 
@@ -124,7 +151,6 @@ class TopStoriesFragment : Fragment() {
             it?.let { storyIdList ->
                 when (storyIdList.status) {
                     Status.SUCCESS -> {
-                        Toast.makeText(requireContext(), "Success", Toast.LENGTH_SHORT).show()
                         storyIdList.data?.let { idList ->
                             cachedStoryIdList =  idList
                             cachedStoryList = ArrayList()
@@ -134,10 +160,8 @@ class TopStoriesFragment : Fragment() {
                         }
                     }
                     Status.ERROR   -> {
-                        Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
                     }
                     Status.LOADING -> {
-                        Toast.makeText(requireContext(), "Load", Toast.LENGTH_SHORT).show()
                     }
                 }
             }

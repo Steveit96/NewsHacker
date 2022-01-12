@@ -12,7 +12,6 @@ import com.steven.newshacker.utils.Constants
 import java.lang.Exception
 import java.util.*
 import android.webkit.WebView
-import android.widget.Toast
 import com.google.android.material.appbar.AppBarLayout
 import kotlin.math.abs
 

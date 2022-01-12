@@ -8,4 +8,5 @@
     <string name="string_label_point">score</string>
     <string name="string_label_comment">Comments</string>
     <string name="string_label_article">Full Article</string>
+    <string name="string_menu_search">Search</string>
 </resources>
