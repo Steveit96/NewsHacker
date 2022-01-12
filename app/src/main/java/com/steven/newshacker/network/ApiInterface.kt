@@ -1,5 +1,6 @@
 package com.steven.newshacker.network
 
+import com.steven.newshacker.model.CommentModel
 import com.steven.newshacker.model.StoryModel
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
@@ -13,4 +14,7 @@ interface ApiInterface {
 
     @GET("item/{storyId}.json?print=pretty")
     suspend fun getTopStoryById(@Path("storyId") storyId: String) : StoryModel
+
+    @GET("item/{commentID}.json?print=pretty")
+    suspend fun getCommentById(@Path("commentID") commentID: String) : CommentModel
 }

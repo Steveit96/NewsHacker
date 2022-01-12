@@ -9,4 +9,6 @@ class StoryRepository(private val apiHelper: ApiHelper) {
 
     suspend fun fetchStoryById(storyId: String) = apiHelper.fetchStoryById(storyId)
 
+    suspend fun fetchCommentsById(commentID: String) = apiHelper.fetchCommentsByID(commentID)
+
 }

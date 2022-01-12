@@ -20,6 +20,6 @@ class StoryAdapter(
     }
 
     override fun onBindViewHolder(holder: StoryViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), position == currentList.size-1)
     }
 }
