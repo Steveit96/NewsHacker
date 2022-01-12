@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.steven.newshacker.network.ApiHelper
 import com.steven.newshacker.repository.StoryRepository
 import com.steven.newshacker.ui.beststories.BestStoriesViewModel
+import com.steven.newshacker.ui.comments.CommentsViewModel
 import com.steven.newshacker.ui.newstories.NewsStoriesViewModel
 import com.steven.newshacker.ui.topstories.TopStoriesViewModel
 
@@ -17,6 +18,8 @@ class ViewModelFactory(private val apiHelper: ApiHelper) : ViewModelProvider.Fac
             return BestStoriesViewModel(StoryRepository(apiHelper)) as T
         } else if (modelClass.isAssignableFrom(NewsStoriesViewModel::class.java)) {
             return NewsStoriesViewModel(StoryRepository(apiHelper)) as T
+        } else if (modelClass.isAssignableFrom(CommentsViewModel::class.java)) {
+            return CommentsViewModel(StoryRepository(apiHelper)) as T
         } else {
             throw IllegalArgumentException("Unknown class name")
         }

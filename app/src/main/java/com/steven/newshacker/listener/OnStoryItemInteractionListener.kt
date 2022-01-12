@@ -6,8 +6,6 @@ interface OnStoryItemInteractionListener {
 
     fun onCommentClicked(story: StoryModel)
 
-    fun onItemClicked(story: StoryModel)
-
     fun onArticleClicked(story: StoryModel)
 
 }

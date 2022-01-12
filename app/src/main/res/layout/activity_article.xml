@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+  <com.google.android.material.appbar.AppBarLayout
+      android:id="@+id/appBarLayout"
+      android:layout_width="match_parent"
+      android:visibility="gone"
+      android:layout_height="wrap_content"
+      android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+    <com.google.android.material.appbar.CollapsingToolbarLayout
+        android:id="@+id/layout_collapse"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:contentScrim="@color/red"
+        app:expandedTitleGravity="top"
+        app:titleCollapseMode="scale"
+        app:expandedTitleMarginStart="24dp"
+        app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+      <include
+          android:id="@+id/layout_header"
+          layout="@layout/layout_header"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_weight="0"
+          android:visibility="visible"
+          app:layout_constraintBottom_toTopOf="@+id/layout_web"
+          />
+      <androidx.appcompat.widget.Toolbar
+          android:layout_width="match_parent"
+          android:layout_height="?attr/actionBarSize"
+          app:layout_collapseMode="pin"
+          app:popupTheme="@style/ThemeOverlay.AppCompat.Dark" />
+
+    </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+  </com.google.android.material.appbar.AppBarLayout>
+
+  <!--Now add the NestedScollView-->
+  <androidx.core.widget.NestedScrollView
+      android:id="@+id/nested_scroll_view"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:visibility="gone"
+      app:layout_behavior="@string/appbar_scrolling_view_behavior"
+      tools:ignore="WebViewLayout">
+
+    <!--In textview we will be adding the text that i have
+        added earlier in strings.xml file.This is simply the
+        the content to be scrolled -->
+    <WebView
+        android:id="@+id/layout_web"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/layout_header"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        ></WebView>
+  </androidx.core.widget.NestedScrollView>
+
+  <ProgressBar
+      android:id="@+id/progress_bar"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

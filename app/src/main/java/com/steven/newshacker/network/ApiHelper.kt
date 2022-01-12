@@ -7,4 +7,7 @@ class ApiHelper(private val apiInterface: ApiInterface) {
 
     // Fetch the story details based on the ID
     suspend fun fetchStoryById(storyId: String) = apiInterface.getTopStoryById(storyId)
+
+    // Fetch the story details based on the ID
+    suspend fun fetchCommentsByID(commentID: String) = apiInterface.getCommentById(commentID)
 }
