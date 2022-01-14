@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.SearchView
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -17,11 +18,12 @@ import com.steven.newshacker.adapter.StoryAdapter
 import com.steven.newshacker.databinding.FragmentBestStoriesBinding
 import com.steven.newshacker.listener.OnStoryItemInteractionListener
 import com.steven.newshacker.model.StoryModel
-import com.steven.newshacker.network.ApiHelper
-import com.steven.newshacker.network.RetrofitBuilder
+import com.steven.newshacker.network.StoryApiHelper
+import com.steven.newshacker.network.StoryNetWorkApiClient
 import com.steven.newshacker.ui.article.ArticleActivity
-import com.steven.newshacker.ui.ViewModelFactory
+import com.steven.newshacker.ui.StoryViewModelFactory
 import com.steven.newshacker.ui.comments.CommentsActivity
+import com.steven.newshacker.ui.search.SearchActivity
 import com.steven.newshacker.utils.Constants
 
 class BestStoriesFragment : Fragment() {
@@ -82,6 +84,14 @@ class BestStoriesFragment : Fragment() {
         search.setSearchableInfo(manager.getSearchableInfo(requireActivity().componentName))
         search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
+                if (query.isNullOrEmpty().not()) {
+                    startActivity(Intent(
+                            requireActivity(),
+                            SearchActivity::class.java
+                    ).putExtra(Constants.KEY_BUNDLE_SEARCH_QUERY, query))
+                } else {
+                    Toast.makeText(requireContext(), "Blank Query not allowed !", Toast.LENGTH_SHORT).show()
+                }
                 return true
             }
 
@@ -98,7 +108,7 @@ class BestStoriesFragment : Fragment() {
     ): View {
         bestStoriesViewModel = ViewModelProvider(
             this,
-            ViewModelFactory(ApiHelper(RetrofitBuilder.apiService))
+            StoryViewModelFactory(StoryApiHelper(StoryNetWorkApiClient.STORY_API_SERVICE))
         )[BestStoriesViewModel::class.java]
         setHasOptionsMenu(true)
         _binding = FragmentBestStoriesBinding.inflate(inflater, container, false)

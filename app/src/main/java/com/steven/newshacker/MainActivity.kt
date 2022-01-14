@@ -30,7 +30,6 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_top,
                 R.id.navigation_best,
                 R.id.navigation_new,
-                R.id.navigation_more,
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)

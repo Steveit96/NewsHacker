@@ -7,7 +7,7 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 
-interface ApiInterface {
+interface StoryApiInterface {
 
     @GET("{strorytype}.json?print=pretty")
     suspend fun getStoryIDList(@Path("strorytype") strorytype: String): List<Long>
