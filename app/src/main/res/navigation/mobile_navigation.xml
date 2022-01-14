@@ -22,10 +22,4 @@
         android:name="com.steven.newshacker.ui.newstories.NewStoriesFragment"
         android:label="@string/new_stories"
         tools:layout="@layout/fragment_new_stories" />
-
-    <fragment
-        android:id="@+id/navigation_more"
-        android:name="com.steven.newshacker.ui.more.MoreFragment"
-        android:label="@string/more"
-        tools:layout="@layout/fragment_more" />
 </navigation>

@@ -1,59 +1,55 @@
-package com.steven.newshacker.ui.topstories
+package com.steven.newshacker.ui.search
 
 import android.annotation.SuppressLint
-import android.app.SearchManager
-import android.content.Context
 import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.*
-import android.widget.SearchView
+import android.view.View
 import android.widget.Toast
 import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.mindorks.retrofit.coroutines.utils.Status
-import com.steven.newshacker.R
 import com.steven.newshacker.adapter.StoryAdapter
-import com.steven.newshacker.databinding.FragmentTopStoriesBinding
+import com.steven.newshacker.databinding.ActivitySearchBinding
 import com.steven.newshacker.listener.OnStoryItemInteractionListener
+import com.steven.newshacker.model.HitsModel
 import com.steven.newshacker.model.StoryModel
+import com.steven.newshacker.network.SearchApiHelper
+import com.steven.newshacker.network.SearchNetworkApiClient
 import com.steven.newshacker.network.StoryApiHelper
 import com.steven.newshacker.network.StoryNetWorkApiClient
-import com.steven.newshacker.ui.search.SearchActivity
+import com.steven.newshacker.ui.SearchViewModelFactory
 import com.steven.newshacker.ui.article.ArticleActivity
 import com.steven.newshacker.ui.comments.CommentsActivity
-import com.steven.newshacker.ui.StoryViewModelFactory
 import com.steven.newshacker.utils.Constants
-import kotlin.collections.ArrayList
 
+class SearchActivity : AppCompatActivity() {
 
-class TopStoriesFragment : Fragment() {
+    private var searchQuery = ""
 
-    private lateinit var topStoriesViewModel: TopStoriesViewModel
-    private var _binding: FragmentTopStoriesBinding? =
-            null
+    private lateinit var searchViewModel: SearchViewModel
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding !!
+    private lateinit var binding: ActivitySearchBinding
 
-    private var firstIndex = 0
+    private var totalCount = 0
 
-    private var lastIndex = 10
-
-    private var cachedStoryIdList: List<Long> = ArrayList()
+    private var cachedStoryIdList: List<HitsModel> = ArrayList()
 
     private var cachedStoryList = ArrayList<StoryModel>()
 
     private var loading = false
+
+    private var firstIndex = 0
+
+    private var lastIndex = 9
 
     private val storyAdapter by lazy {
         StoryAdapter(object : OnStoryItemInteractionListener {
             override fun onCommentClicked(story: StoryModel) {
                 val commentBundle =
                         bundleOf(Constants.KEY_BUNDLE_OF__STORY_COMMENTS to story.kids)
-                startActivity(Intent(activity, CommentsActivity::class.java).apply {
+                startActivity(Intent(this@SearchActivity, CommentsActivity::class.java).apply {
                     putExtra(Constants.BUNDLE_STORY_TITLE, story.title)
                     putExtra(Constants.BUNDLE_STORY_AUTHOR, story.by)
                     putExtra(Constants.BUNDLE_STORY_CREATED_AT, story.time)
@@ -65,7 +61,7 @@ class TopStoriesFragment : Fragment() {
             }
 
             override fun onArticleClicked(story: StoryModel) {
-                startActivity(Intent(activity, ArticleActivity::class.java).apply {
+                startActivity(Intent(this@SearchActivity, ArticleActivity::class.java).apply {
                     putExtra(Constants.BUNDLE_STORY_TITLE, story.title)
                     putExtra(Constants.BUNDLE_STORY_AUTHOR, story.by)
                     putExtra(Constants.BUNDLE_STORY_CREATED_AT, story.time)
@@ -78,58 +74,31 @@ class TopStoriesFragment : Fragment() {
         })
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.search_menu, menu)
-        val manager = requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        val search: SearchView = menu.findItem(R.id.search).actionView as SearchView
-        search.setSearchableInfo(manager.getSearchableInfo(requireActivity().componentName))
-        search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                if (query.isNullOrEmpty().not()) {
-                   startActivity(Intent(
-                           requireActivity(),
-                           SearchActivity::class.java
-                   ).putExtra(Constants.KEY_BUNDLE_SEARCH_QUERY, query))
-                } else {
-                    Toast.makeText(requireContext(), "Blank Query not allowed !", Toast.LENGTH_SHORT).show()
-                }
-                return true
-            }
-
-            override fun onQueryTextChange(query: String?): Boolean {
-                return true
-            }
-        })
-    }
-
-    override fun onCreateView(inflater: LayoutInflater,
-                              container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
-        setHasOptionsMenu(true)
-        topStoriesViewModel = ViewModelProvider(this,
-                        StoryViewModelFactory(StoryApiHelper(StoryNetWorkApiClient.STORY_API_SERVICE)))[TopStoriesViewModel::class.java]
-        _binding = FragmentTopStoriesBinding.inflate(inflater, container, false)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivitySearchBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setupUI()
-        return binding.root
     }
-
 
     private fun setupUI() {
-        binding.topStoryList.adapter = storyAdapter
-        binding.topStoryList.addOnScrollListener(
+        binding.storyList.adapter = storyAdapter
+        searchQuery = intent?.getStringExtra(Constants.KEY_BUNDLE_SEARCH_QUERY).orEmpty()
+        setTitle(searchQuery)
+        binding.storyList.addOnScrollListener(
                 object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                         val layoutManager = recyclerView.layoutManager
                         if (layoutManager is androidx.recyclerview.widget.LinearLayoutManager) {
-                            if (dy > 0) //check for scroll down
-                            {
+                            if (dy > 0) {
                                 if (loading) {
                                     if ((layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition()) >= layoutManager.itemCount) {
                                         loading = false
                                         firstIndex = lastIndex
                                         lastIndex += 10
-                                        if (lastIndex > cachedStoryIdList.size - 1) {
-                                            lastIndex = cachedStoryIdList.size - 1
+                                        // If the number of story is lesser then the initial count then assign totalCount-1 as last count
+                                        if (lastIndex > totalCount) {
+                                            lastIndex = totalCount-1
                                         }
                                         if (lastIndex <= cachedStoryIdList.size - 1) {
                                             fetchStoryById(cachedStoryIdList.subList(firstIndex,
@@ -145,20 +114,34 @@ class TopStoriesFragment : Fragment() {
                     }
                 },
         )
-        fetchStoryIdList()
+        searchViewModel = ViewModelProvider(this,
+                SearchViewModelFactory(
+                        SearchApiHelper(SearchNetworkApiClient.SEARCH_API_SERVICE),
+                        StoryApiHelper(StoryNetWorkApiClient.STORY_API_SERVICE),
+                ))[SearchViewModel::class.java]
+        fetchStoryBySearchQuery(searchQuery)
     }
 
-    private fun fetchStoryIdList() {
-        topStoriesViewModel.getTopStoriesIDList(VALUE_TYPE_TOP_STORY).observe(viewLifecycleOwner, {
+    private fun fetchStoryBySearchQuery(searchQuery: String) {
+        searchViewModel.getStoryBySearchQuery(
+                hitsPerPage = VALUE_HITS_PER_PAGE,
+                tags = VALUE_TAG,
+                attributesToRetrieve = VALUE_ATTRIBUTE_TO_RETRIEVE,
+                attributesToHighlight = VALUE_ATTRIBUTE_TO_HIGHLIGHT,
+                query = searchQuery,
+        ).observe(this, {
             it?.let { storyIdList ->
                 when (storyIdList.status) {
                     Status.SUCCESS -> {
-                        storyIdList.data?.let { idList ->
-                            cachedStoryIdList = idList
+                        storyIdList.data?.let {
+                            totalCount = it.nbHits.toInt()
+                            cachedStoryIdList = it.hits
                             cachedStoryList = ArrayList()
-                            idList.subList(this.firstIndex, this.lastIndex).let { subList ->
-                                fetchStoryById(subList, 0, subList.size)
+                            // If the number of story is lesser then the initial count then assign totalCount-1 as last count
+                            if (lastIndex > totalCount) {
+                                lastIndex = totalCount-1
                             }
+                            fetchStoryById(storyIdList = storyIdList.data?.hits!!, firstIndex = 0, lastIndex = lastIndex)
                         }
                     }
                     Status.ERROR   -> {
@@ -171,13 +154,13 @@ class TopStoriesFragment : Fragment() {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun fetchStoryById(storyIdList: List<Long>, firstIndex: Int, lastIndex: Int) {
-        topStoriesViewModel.getTopStoriesById(storyIdList[firstIndex].toString())
-                .observe(viewLifecycleOwner, { storyResource ->
+    private fun fetchStoryById(storyIdList: List<HitsModel>, firstIndex: Int, lastIndex: Int) {
+        searchViewModel.getStoriesById(storyIdList[firstIndex].objectID)
+                .observe(this, { storyResource ->
                     storyResource?.let { story ->
                         when (story.status) {
                             Status.SUCCESS -> {
-                                cachedStoryList.add(story.data !!)
+                                cachedStoryList.add(story.data!!)
                                 if (firstIndex == lastIndex - 1) {
                                     loading = true
                                     binding.progressBar.visibility = View.GONE
@@ -190,22 +173,20 @@ class TopStoriesFragment : Fragment() {
                                 }
                             }
                             Status.ERROR   -> {
-                                binding.progressBar.visibility = View.GONE
+                                Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
                             }
                             Status.LOADING -> {
-                                binding.progressBar.visibility = View.VISIBLE
+                                Toast.makeText(this, "LOADING", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
                 })
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
     companion object {
-        private const val VALUE_TYPE_TOP_STORY = "topstories"
+        private const val VALUE_TAG = "story"
+        private const val VALUE_HITS_PER_PAGE = "100"
+        private const val VALUE_ATTRIBUTE_TO_RETRIEVE = "objectID"
+        private const val VALUE_ATTRIBUTE_TO_HIGHLIGHT = "none"
     }
 }

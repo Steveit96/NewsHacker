@@ -18,9 +18,9 @@ import com.steven.newshacker.adapter.CommentsAdapter
 import com.steven.newshacker.databinding.ActivityCommentsBinding
 import com.steven.newshacker.listener.OnCommentsInteractionListener
 import com.steven.newshacker.model.CommentModel
-import com.steven.newshacker.network.ApiHelper
-import com.steven.newshacker.network.RetrofitBuilder
-import com.steven.newshacker.ui.ViewModelFactory
+import com.steven.newshacker.network.StoryApiHelper
+import com.steven.newshacker.network.StoryNetWorkApiClient
+import com.steven.newshacker.ui.StoryViewModelFactory
 import com.steven.newshacker.utils.Constants
 import java.lang.Exception
 import java.util.*
@@ -72,7 +72,7 @@ class CommentsActivity : AppCompatActivity() {
         setContentView(binding.root)
         commentsViewModel = ViewModelProvider(
             this,
-            ViewModelFactory(ApiHelper(RetrofitBuilder.apiService)))[CommentsViewModel::class.java]
+            StoryViewModelFactory(StoryApiHelper(StoryNetWorkApiClient.STORY_API_SERVICE)))[CommentsViewModel::class.java]
         setUpUI()
     }
 

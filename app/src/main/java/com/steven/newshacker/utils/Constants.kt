@@ -8,5 +8,7 @@ object Constants {
     const val BUNDLE_STORY_TYPE = "bundle_story_type"
     const val BUNDLE_STORY_SCORE = "bundle_story_score"
     const val BUNDLE_STORY_COMMENTS = "bundle_story_comments"
-    const val KEY_BUNDLE_OF__STORY_COMMENTS = "bundle_story_comments"
+    const val KEY_BUNDLE_OF__STORY_COMMENTS = "key_bundle_of_story_comments"
+
+    const val KEY_BUNDLE_SEARCH_QUERY = "key_bundle_search_query"
 }

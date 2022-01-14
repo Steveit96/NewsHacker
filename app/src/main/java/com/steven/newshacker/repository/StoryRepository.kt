@@ -1,14 +1,13 @@
 package com.steven.newshacker.repository
 
-import com.steven.newshacker.network.ApiHelper
-import com.steven.newshacker.network.ApiInterface
+import com.steven.newshacker.network.StoryApiHelper
 
-class StoryRepository(private val apiHelper: ApiHelper) {
+class StoryRepository(private val storyApiHelper: StoryApiHelper) {
 
-    suspend fun fetchStoriesIDList(storyType: String) = apiHelper.fetchStoryIDList(storyType)
+    suspend fun fetchStoriesIDList(storyType: String) = storyApiHelper.fetchStoryIDList(storyType)
 
-    suspend fun fetchStoryById(storyId: String) = apiHelper.fetchStoryById(storyId)
+    suspend fun fetchStoryById(storyId: String) = storyApiHelper.fetchStoryById(storyId)
 
-    suspend fun fetchCommentsById(commentID: String) = apiHelper.fetchCommentsByID(commentID)
+    suspend fun fetchCommentsById(commentID: String) = storyApiHelper.fetchCommentsByID(commentID)
 
 }

@@ -12,9 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NewsHacker">
         <activity
-            android:name=".ui.comments.CommentsActivity"
-            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:name=".ui.search.SearchActivity"
             android:exported="true" />
+        <activity
+            android:name=".ui.comments.CommentsActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity
             android:name=".ui.article.ArticleActivity"
             android:exported="true"
