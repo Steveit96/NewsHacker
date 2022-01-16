@@ -4,7 +4,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="layout_story_margin">8dp</dimen>
     <dimen name="layout_story_card_elevation">12dp</dimen>
-    <dimen name="layout_story_card_radius">8dp</dimen>
+    <dimen name="layout_story_card_radius">12dp</dimen>
     <dimen name="layout_story_title_margin">8dp</dimen>
     <dimen name="layout_story_author_margin_left">8dp</dimen>
     <dimen name="layout_story_author_drawable_padding_left">8dp</dimen>
