@@ -29,6 +29,7 @@
         <entry key="app/src/main/res/layout/fragment_dashboard.xml" value="0.25905797101449274" />
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.25905797101449274" />
         <entry key="app/src/main/res/layout/fragment_more.xml" value="0.25905797101449274" />
+        <entry key="app/src/main/res/layout/fragment_new_stories.xml" value="0.18385416666666668" />
         <entry key="app/src/main/res/layout/fragment_notifications.xml" value="0.25905797101449274" />
         <entry key="app/src/main/res/layout/fragment_top_stories.xml" value="0.25" />
         <entry key="app/src/main/res/layout/layout_comment.xml" value="0.334375" />

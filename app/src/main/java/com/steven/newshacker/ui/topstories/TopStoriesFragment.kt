@@ -5,32 +5,40 @@ import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import android.view.*
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.mindorks.retrofit.coroutines.utils.Status
 import com.steven.newshacker.R
 import com.steven.newshacker.adapter.StoryAdapter
 import com.steven.newshacker.databinding.FragmentTopStoriesBinding
+import com.steven.newshacker.isNetWorkAvailable
 import com.steven.newshacker.listener.OnStoryItemInteractionListener
 import com.steven.newshacker.model.StoryModel
-import com.steven.newshacker.network.StoryApiHelper
-import com.steven.newshacker.network.StoryNetWorkApiClient
+import com.steven.newshacker.networkNotAvailableToast
 import com.steven.newshacker.ui.search.SearchActivity
 import com.steven.newshacker.ui.article.ArticleActivity
 import com.steven.newshacker.ui.comments.CommentsActivity
-import com.steven.newshacker.ui.StoryViewModelFactory
 import com.steven.newshacker.utils.Constants
+import com.steven.newshacker.utils.Constants.NETWORK_ERROR
+import com.steven.newshacker.utils.Constants.SWIPE_DEFAULT_LOAD_TIME
+import com.steven.newshacker.viewmodel.StoriesViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlin.collections.ArrayList
 
 
+@AndroidEntryPoint
 class TopStoriesFragment : Fragment() {
 
-    private lateinit var topStoriesViewModel: TopStoriesViewModel
+    private val storiesViewModel by viewModels<StoriesViewModel>()
+
     private var _binding: FragmentTopStoriesBinding? =
             null
 
@@ -48,33 +56,41 @@ class TopStoriesFragment : Fragment() {
 
     private var loading = false
 
+
     private val storyAdapter by lazy {
         StoryAdapter(object : OnStoryItemInteractionListener {
             override fun onCommentClicked(story: StoryModel) {
-                val commentBundle =
-                        bundleOf(Constants.KEY_BUNDLE_OF__STORY_COMMENTS to story.kids)
-                startActivity(Intent(activity, CommentsActivity::class.java).apply {
-                    putExtra(Constants.BUNDLE_STORY_TITLE, story.title)
-                    putExtra(Constants.BUNDLE_STORY_AUTHOR, story.by)
-                    putExtra(Constants.BUNDLE_STORY_CREATED_AT, story.time)
-                    putExtra(Constants.BUNDLE_STORY_TYPE, story.type)
-                    putExtra(Constants.BUNDLE_STORY_SCORE, story.score.toString())
-                    putExtra(Constants.BUNDLE_STORY_URL, story.url)
-                    putExtra(Constants.BUNDLE_STORY_COMMENTS, commentBundle)
-                })
+                if (requireContext().isNetWorkAvailable()) {
+                    val commentBundle =
+                            bundleOf(Constants.KEY_BUNDLE_OF__STORY_COMMENTS to story.kids)
+                    startActivity(Intent(activity, CommentsActivity::class.java).apply {
+                        putExtra(Constants.BUNDLE_STORY_TITLE, story.title)
+                        putExtra(Constants.BUNDLE_STORY_AUTHOR, story.by)
+                        putExtra(Constants.BUNDLE_STORY_CREATED_AT, story.time)
+                        putExtra(Constants.BUNDLE_STORY_TYPE, story.type)
+                        putExtra(Constants.BUNDLE_STORY_SCORE, story.score.toString())
+                        putExtra(Constants.BUNDLE_STORY_URL, story.url)
+                        putExtra(Constants.BUNDLE_STORY_COMMENTS, commentBundle)
+                    })
+                } else {
+                    requireContext().networkNotAvailableToast()
+                }
             }
 
             override fun onArticleClicked(story: StoryModel) {
-                startActivity(Intent(activity, ArticleActivity::class.java).apply {
-                    putExtra(Constants.BUNDLE_STORY_TITLE, story.title)
-                    putExtra(Constants.BUNDLE_STORY_AUTHOR, story.by)
-                    putExtra(Constants.BUNDLE_STORY_CREATED_AT, story.time)
-                    putExtra(Constants.BUNDLE_STORY_TYPE, story.type)
-                    putExtra(Constants.BUNDLE_STORY_SCORE, story.score.toString())
-                    putExtra(Constants.BUNDLE_STORY_URL, story.url)
-                })
+                if (requireContext().isNetWorkAvailable()) {
+                    startActivity(Intent(activity, ArticleActivity::class.java).apply {
+                        putExtra(Constants.BUNDLE_STORY_TITLE, story.title)
+                        putExtra(Constants.BUNDLE_STORY_AUTHOR, story.by)
+                        putExtra(Constants.BUNDLE_STORY_CREATED_AT, story.time)
+                        putExtra(Constants.BUNDLE_STORY_TYPE, story.type)
+                        putExtra(Constants.BUNDLE_STORY_SCORE, story.score.toString())
+                        putExtra(Constants.BUNDLE_STORY_URL, story.url)
+                    })
+                } else {
+                    requireContext().networkNotAvailableToast()
+                }
             }
-
         })
     }
 
@@ -106,16 +122,23 @@ class TopStoriesFragment : Fragment() {
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
         setHasOptionsMenu(true)
-        topStoriesViewModel = ViewModelProvider(this,
-                        StoryViewModelFactory(StoryApiHelper(StoryNetWorkApiClient.STORY_API_SERVICE)))[TopStoriesViewModel::class.java]
         _binding = FragmentTopStoriesBinding.inflate(inflater, container, false)
-        setupUI()
+        binding.swipeToRefresh.setOnRefreshListener {
+            setupUI(true)
+            Handler(Looper.getMainLooper()).postDelayed({
+                binding.swipeToRefresh.isRefreshing = false
+            }, SWIPE_DEFAULT_LOAD_TIME)
+        }
+        setupUI(false)
         return binding.root
     }
 
 
-    private fun setupUI() {
+    private fun setupUI(isRefresh: Boolean) {
         binding.topStoryList.adapter = storyAdapter
+        if (isRefresh) {
+            storyAdapter.submitList(emptyList())
+        }
         binding.topStoryList.addOnScrollListener(
                 object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -145,25 +168,32 @@ class TopStoriesFragment : Fragment() {
                     }
                 },
         )
-        fetchStoryIdList()
+        if (requireContext().isNetWorkAvailable()) {
+            fetchStoryIdList()
+        } else {
+            fetchFromDB()
+        }
     }
 
     private fun fetchStoryIdList() {
-        topStoriesViewModel.getTopStoriesIDList(VALUE_TYPE_TOP_STORY).observe(viewLifecycleOwner, {
+        storiesViewModel.getTopStoriesIDList(VALUE_TYPE_TOP_STORY).observe(viewLifecycleOwner, {
             it?.let { storyIdList ->
                 when (storyIdList.status) {
                     Status.SUCCESS -> {
                         storyIdList.data?.let { idList ->
                             cachedStoryIdList = idList
+                            Log.d(TAG, "$VALUE_TYPE_TOP_STORY List fetch : $idList")
                             cachedStoryList = ArrayList()
                             idList.subList(this.firstIndex, this.lastIndex).let { subList ->
                                 fetchStoryById(subList, 0, subList.size)
                             }
                         }
                     }
-                    Status.ERROR   -> {
-                    }
-                    Status.LOADING -> {
+
+                   Status.LOADING -> {
+                   }
+                    Status.ERROR -> {
+                        Log.d(TAG, "$VALUE_TYPE_TOP_STORY List fetch : "+storyIdList.message)
                     }
                 }
             }
@@ -172,17 +202,22 @@ class TopStoriesFragment : Fragment() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun fetchStoryById(storyIdList: List<Long>, firstIndex: Int, lastIndex: Int) {
-        topStoriesViewModel.getTopStoriesById(storyIdList[firstIndex].toString())
+        storiesViewModel.getTopStoriesById(storyIdList[firstIndex].toString(), VALUE_TYPE_TOP_STORY)
                 .observe(viewLifecycleOwner, { storyResource ->
                     storyResource?.let { story ->
                         when (story.status) {
                             Status.SUCCESS -> {
-                                cachedStoryList.add(story.data !!)
+                                story.data!!.apply {
+                                    storyType = VALUE_TYPE_TOP_STORY
+                                }
+                                cachedStoryList.add(story.data)
+                                Log.d(TAG, "$VALUE_TYPE_TOP_STORY fetch : "+story.data.toString())
                                 if (firstIndex == lastIndex - 1) {
                                     loading = true
                                     binding.progressBar.visibility = View.GONE
                                     storyAdapter.submitList(cachedStoryList)
                                     storyAdapter.notifyDataSetChanged()
+                                    insertStories(cachedStoryList)
                                 }
                                 if (firstIndex != lastIndex - 1) {
                                     loading = false
@@ -191,6 +226,7 @@ class TopStoriesFragment : Fragment() {
                             }
                             Status.ERROR   -> {
                                 binding.progressBar.visibility = View.GONE
+                                Log.d(TAG, "$VALUE_TYPE_TOP_STORY fetch : "+story.message)
                             }
                             Status.LOADING -> {
                                 binding.progressBar.visibility = View.VISIBLE
@@ -200,6 +236,47 @@ class TopStoriesFragment : Fragment() {
                 })
     }
 
+    private fun fetchFromDB() {
+        storiesViewModel.fetchAllStoriesFromDB(VALUE_TYPE_TOP_STORY).observe( viewLifecycleOwner, {
+            storyResource ->
+            storyResource?.let { story ->
+                when (story.status) {
+                    Status.SUCCESS -> {
+                            binding.progressBar.visibility = View.GONE
+                            storyAdapter.submitList(story.data)
+                        Log.d(TAG, "Fetch $VALUE_TYPE_TOP_STORY from DB:" + story.data.toString())
+                    }
+                    Status.ERROR   -> {
+                        binding.progressBar.visibility = View.GONE
+                        Log.d(TAG, "Fetch $VALUE_TYPE_TOP_STORY from DB:" + story.message)
+                    }
+                    Status.LOADING -> {
+                        binding.progressBar.visibility = View.VISIBLE
+                    }
+                }
+            }
+        })
+    }
+
+    private fun insertStories(storyList: List<StoryModel>) {
+        storiesViewModel.insertAllStories(storyList).observe( viewLifecycleOwner, {
+            insertAction ->
+            insertAction?.let { insert ->
+                when (insert.status) {
+                    Status.SUCCESS -> {
+                       Log.d(TAG, "$VALUE_TYPE_TOP_STORY: ${insert.data.orEmpty()}")
+                    }
+                    Status.LOADING -> {
+                        Log.d(TAG, "$VALUE_TYPE_TOP_STORY: Insert Loading}")
+                    }
+                    Status.ERROR   -> {
+                        Log.d(TAG, "$VALUE_TYPE_TOP_STORY: ${insert.message.orEmpty()}")
+                    }
+                }
+            }
+        })
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -207,5 +284,6 @@ class TopStoriesFragment : Fragment() {
 
     companion object {
         private const val VALUE_TYPE_TOP_STORY = "topstories"
+        private const val TAG = "TopStoriesFragment"
     }
 }

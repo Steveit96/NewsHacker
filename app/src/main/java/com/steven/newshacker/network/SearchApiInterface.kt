@@ -6,6 +6,10 @@ import retrofit2.http.Query
 
 interface SearchApiInterface {
 
+    companion object {
+        const val BASE_URL = "https://hn.algolia.com/api/v1/"
+    }
+
     @GET("search_by_date")
     suspend fun searchStoryByQuery(
             @Query("hitsPerPage") hitsPerPage: String,

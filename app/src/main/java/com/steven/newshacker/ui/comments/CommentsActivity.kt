@@ -8,25 +8,27 @@ import android.text.Html
 import android.text.format.DateFormat
 import android.util.Log
 import android.view.View
+import androidx.activity.viewModels
 
 import androidx.core.os.bundleOf
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.AppBarLayout
 import com.mindorks.retrofit.coroutines.utils.Status
 import com.steven.newshacker.adapter.CommentsAdapter
 import com.steven.newshacker.databinding.ActivityCommentsBinding
+import com.steven.newshacker.isNetWorkAvailable
 import com.steven.newshacker.listener.OnCommentsInteractionListener
 import com.steven.newshacker.model.CommentModel
-import com.steven.newshacker.network.StoryApiHelper
-import com.steven.newshacker.network.StoryNetWorkApiClient
-import com.steven.newshacker.ui.StoryViewModelFactory
+import com.steven.newshacker.networkNotAvailableToast
 import com.steven.newshacker.utils.Constants
+import com.steven.newshacker.viewmodel.CommentsViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.lang.Exception
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.abs
 
+@AndroidEntryPoint
 class CommentsActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "CommentsActivity"
@@ -34,7 +36,7 @@ class CommentsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCommentsBinding
 
-    private lateinit var commentsViewModel: CommentsViewModel
+    private val commentsViewModel by viewModels<CommentsViewModel>()
 
     private var  firstIndex = 0
 
@@ -50,18 +52,22 @@ class CommentsActivity : AppCompatActivity() {
         CommentsAdapter(
             object : OnCommentsInteractionListener {
                 override fun commentsClicked(comment: CommentModel) {
-                    val commentBundle = bundleOf(
-                        Constants.KEY_BUNDLE_OF__STORY_COMMENTS to comment.kids)
-                    startActivity(Intent(this@CommentsActivity, CommentsActivity::class.java).apply {
-                        putExtra(Constants.BUNDLE_STORY_TITLE, comment.text)
-                        putExtra(Constants.BUNDLE_STORY_AUTHOR, comment.by)
-                        putExtra(Constants.BUNDLE_STORY_CREATED_AT, comment.time)
-                        putExtra(Constants.BUNDLE_STORY_TYPE, comment.type)
-                        putExtra(Constants.BUNDLE_STORY_SCORE, "")
-                        putExtra(Constants.BUNDLE_STORY_URL, "")
-                        putExtra(Constants.BUNDLE_STORY_COMMENTS, commentBundle)
-                    })
-                    finish()
+                    if (this@CommentsActivity.isNetWorkAvailable()) {
+                        val commentBundle = bundleOf(
+                                Constants.KEY_BUNDLE_OF__STORY_COMMENTS to comment.kids)
+                        startActivity(Intent(this@CommentsActivity, CommentsActivity::class.java).apply {
+                            putExtra(Constants.BUNDLE_STORY_TITLE, comment.text)
+                            putExtra(Constants.BUNDLE_STORY_AUTHOR, comment.by)
+                            putExtra(Constants.BUNDLE_STORY_CREATED_AT, comment.time)
+                            putExtra(Constants.BUNDLE_STORY_TYPE, comment.type)
+                            putExtra(Constants.BUNDLE_STORY_SCORE, "")
+                            putExtra(Constants.BUNDLE_STORY_URL, "")
+                            putExtra(Constants.BUNDLE_STORY_COMMENTS, commentBundle)
+                        })
+                        finish()
+                    } else {
+                       this@CommentsActivity.networkNotAvailableToast()
+                    }
                 }
             })
     }
@@ -70,9 +76,6 @@ class CommentsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityCommentsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        commentsViewModel = ViewModelProvider(
-            this,
-            StoryViewModelFactory(StoryApiHelper(StoryNetWorkApiClient.STORY_API_SERVICE)))[CommentsViewModel::class.java]
         setUpUI()
     }
 
