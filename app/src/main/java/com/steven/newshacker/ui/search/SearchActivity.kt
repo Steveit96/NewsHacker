@@ -166,10 +166,8 @@ class SearchActivity : AppCompatActivity() {
                                 }
                             }
                             Status.ERROR   -> {
-                                Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
                             }
                             Status.LOADING -> {
-                                Toast.makeText(this, "LOADING", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
