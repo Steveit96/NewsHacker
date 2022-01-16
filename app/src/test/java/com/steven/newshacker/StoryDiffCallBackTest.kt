@@ -25,7 +25,6 @@ class StoryDiffCallBackTest {
         private val itemOne = StoryModel(
                 by =  "norvig",
                 id = 2921983,
-                kids = listOf(2922097, 2922429, 2924562, 2922709, 2922573, 2922140, 2922141),
                 title = "Aw shucks, guys ... you make me blush with your compliments.<p>Tell you what, Ill make a deal: I'll keep writing if you keep reading. K?",
                 time = 1314211127,
                 type = "comment"
@@ -34,7 +33,6 @@ class StoryDiffCallBackTest {
         private val itemTwo = StoryModel(
                 by =  "stephan",
                 id = 2921984,
-                kids = listOf(2922097, 2922429, 2924562, 2922709, 2922573, 2922140, 2922141),
                 title = "test test",
                 time = 1314211127,
                 type = "comment"

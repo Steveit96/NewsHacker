@@ -9,6 +9,10 @@ import retrofit2.http.Path
 
 interface StoryApiInterface {
 
+    companion object {
+        const val BASE_URL = "https://hacker-news.firebaseio.com/v0/"
+    }
+
     @GET("{strorytype}.json?print=pretty")
     suspend fun getStoryIDList(@Path("strorytype") strorytype: String): List<Long>
 

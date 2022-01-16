@@ -1,17 +1,14 @@
-package com.mindorks.retrofit.coroutines.utils
+package xyz.teamgravity.offlinecaching.helper.util
 
-import com.mindorks.retrofit.coroutines.utils.Status.ERROR
-import com.mindorks.retrofit.coroutines.utils.Status.LOADING
-import com.mindorks.retrofit.coroutines.utils.Status.SUCCESS
+sealed class Resource<T>(
+    val data: T? = null,
+    val error: Throwable? = null
+) {
 
 
-data class Resource<out T>(val status: Status, val data: T?, val message: String?) {
-    companion object {
-        fun <T> success(data: T): Resource<T> = Resource(status = SUCCESS, data = data, message = null)
+    class Success<T>(data: T) : Resource<T>(data)
 
-        fun <T> error(data: T?, message: String): Resource<T> =
-            Resource(status = ERROR, data = data, message = message)
+    class Loading<T>(data: T? = null) : Resource<T>(data)
 
-        fun <T> loading(data: T?): Resource<T> = Resource(status = LOADING, data = data, message = null)
-    }
+    class Error<T>(throwable: Throwable, data: T? = null) : Resource<T>(data, throwable)
 }

@@ -1,8 +1,8 @@
 package com.steven.newshacker.repository
 
-import com.steven.newshacker.network.SearchApiHelper
+import com.steven.newshacker.model.SearchModel
 
-class SearchRepository(private val searchApiHelper: SearchApiHelper) {
+interface SearchRepository {
 
     suspend fun fetchSearchStoryByQuery(
             hitsPerPage: String,
@@ -10,12 +10,6 @@ class SearchRepository(private val searchApiHelper: SearchApiHelper) {
             attributesToRetrieve: String,
             attributesToHighlight: String,
             query: String,
-    ) = searchApiHelper.fetchSearchStoryByQuery(
-            hitsPerPage,
-            tags,
-            attributesToRetrieve,
-            attributesToHighlight,
-            query
-    )
+    ): SearchModel
 
 }

@@ -6,8 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.core.os.bundleOf
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.mindorks.retrofit.coroutines.utils.Status
 import com.steven.newshacker.adapter.StoryAdapter
@@ -15,20 +15,18 @@ import com.steven.newshacker.databinding.ActivitySearchBinding
 import com.steven.newshacker.listener.OnStoryItemInteractionListener
 import com.steven.newshacker.model.HitsModel
 import com.steven.newshacker.model.StoryModel
-import com.steven.newshacker.network.SearchApiHelper
-import com.steven.newshacker.network.SearchNetworkApiClient
-import com.steven.newshacker.network.StoryApiHelper
-import com.steven.newshacker.network.StoryNetWorkApiClient
-import com.steven.newshacker.ui.SearchViewModelFactory
 import com.steven.newshacker.ui.article.ArticleActivity
 import com.steven.newshacker.ui.comments.CommentsActivity
 import com.steven.newshacker.utils.Constants
+import com.steven.newshacker.viewmodel.SearchViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SearchActivity : AppCompatActivity() {
 
     private var searchQuery = ""
 
-    private lateinit var searchViewModel: SearchViewModel
+    private val searchViewModel by viewModels<SearchViewModel>()
 
     private lateinit var binding: ActivitySearchBinding
 
@@ -48,7 +46,7 @@ class SearchActivity : AppCompatActivity() {
         StoryAdapter(object : OnStoryItemInteractionListener {
             override fun onCommentClicked(story: StoryModel) {
                 val commentBundle =
-                        bundleOf(Constants.KEY_BUNDLE_OF__STORY_COMMENTS to story.kids)
+                        bundleOf(Constants.KEY_BUNDLE_OF__STORY_COMMENTS to emptyList<Long>())
                 startActivity(Intent(this@SearchActivity, CommentsActivity::class.java).apply {
                     putExtra(Constants.BUNDLE_STORY_TITLE, story.title)
                     putExtra(Constants.BUNDLE_STORY_AUTHOR, story.by)
@@ -114,11 +112,6 @@ class SearchActivity : AppCompatActivity() {
                     }
                 },
         )
-        searchViewModel = ViewModelProvider(this,
-                SearchViewModelFactory(
-                        SearchApiHelper(SearchNetworkApiClient.SEARCH_API_SERVICE),
-                        StoryApiHelper(StoryNetWorkApiClient.STORY_API_SERVICE),
-                ))[SearchViewModel::class.java]
         fetchStoryBySearchQuery(searchQuery)
     }
 

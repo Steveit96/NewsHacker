@@ -11,4 +11,8 @@ object Constants {
     const val KEY_BUNDLE_OF__STORY_COMMENTS = "key_bundle_of_story_comments"
 
     const val KEY_BUNDLE_SEARCH_QUERY = "key_bundle_search_query"
+
+    const val SWIPE_DEFAULT_LOAD_TIME = 3000L
+
+    const val NETWORK_ERROR = "Network Not Available !"
 }
