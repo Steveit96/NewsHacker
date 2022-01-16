@@ -2,8 +2,6 @@ package com.steven.newshacker.network
 
 import com.steven.newshacker.model.CommentModel
 import com.steven.newshacker.model.StoryModel
-import kotlinx.coroutines.flow.Flow
-import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 
