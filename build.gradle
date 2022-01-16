@@ -8,6 +8,11 @@ buildscript {
     ext {
         room_ver = '2.4.1'
         fragment_ver = '1.3.3'
+        life_cycle_ver = '2.4.0'
+        coroutine_ver = '1.5.2'
+        retrofit_ver = '2.9.0'
+        gson_ver = '2.9.0'
+        dagger_ver = '2.37'
     }
 
     dependencies {
